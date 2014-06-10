@@ -1,0 +1,54 @@
+<!--
+ * Copyright 2014 Stephan Knitelius.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+-->
+<!doctype html>
+<html ng-app="messageApp">
+    <head>
+        <meta charset="utf-8">
+        <title ng-bind-template="{{world}}"></title>
+        <link rel="stylesheet" href="css/app.css">
+        <script src="js/libs/angular.js/angular.js"></script>
+        <script src="js/controllers.js"></script>
+        <script src="js/libs/jquery/jquery.js"></script>
+    </head>
+    <body ng-controller="MessageController">
+        <div>
+            <span id="msgNotification"></span>
+        </div>
+        <div id="msgInputArea">
+            <p>Hello {{world}}!</p>
+            <label>Subject:</label> <input ng-model="subject" />
+            <label>Message:</label> <input ng-model="message" />
+            <button>Submit</button>
+        </div>
+        <div id="msgOutputArea">
+            
+        </div>
+        <script>
+                    function getRootURI() {
+                        return "http://"+(document.location.hostname === "" ? "localhost" : document.location.hostname) + ":" +
+                                (document.location.port === "" ? "8080" : document.location.port);
+                    };
+                    
+                    (function poll() {
+                        $.ajax({url: getRootURI() + "/basic-angularJS-EE/newmsg", success: function(data) {
+                                var newMsg = $("msgNotification");
+                                newMsg.empty();
+                                newMsg.append("<p>" + data + "</p>");
+                            }, dataType: "plain/text", complete: poll, timeout: 30000});
+                    })();
+        </script>
+    </body>
+</html>
