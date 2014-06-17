@@ -20,7 +20,9 @@ import com.knitelius.basic.angularjsee.service.MessageBoundary;
 import java.util.Collection;
 import javax.ejb.EJB;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -44,10 +46,23 @@ public class MessageFacadeRest {
         return messageBoundary.getMessageById(id);
     }
 
-    @PUT
+    @POST
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public void addMessage(final Message message) {
         messageBoundary.addMessage(message);
+    }
+
+    @PUT
+    @Path("{id}")
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public void updateMessage(final Message message) {
+        messageBoundary.changeMessage(message);
+    }
+
+    @DELETE
+    @Path("{id}")
+    public void removeMessage(@PathParam("id") Integer id) {
+        messageBoundary.removeMessage(id);
     }
 
     @GET

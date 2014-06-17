@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.knitelius.basic.angularjsee.web.comet;
+package com.knitelius.basic.angularjsee.web.longpolling;
 
 import com.knitelius.basic.angularjsee.model.Message;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.enterprise.event.Observes;
 import javax.servlet.AsyncContext;
 import javax.servlet.AsyncEvent;
@@ -40,7 +41,7 @@ import javax.ws.rs.core.MediaType;
  * @author Stephan Knitelius <stephan@knitelius.com>
  */
 @WebServlet(urlPatterns = {"/newmsg"}, asyncSupported = true)
-public class NewMessageNotifierComet extends HttpServlet {
+public class NewMessageNotifierLongPolling extends HttpServlet {
 
     private static final Queue<AsyncContext> peers = new ConcurrentLinkedQueue();
 
@@ -51,13 +52,13 @@ public class NewMessageNotifierComet extends HttpServlet {
      */
     public void notifyClientsAboutNewMessage(@Observes Message msg) {
         for (final AsyncContext ac : peers) {
-            final PrintWriter writer;
             try {
-                ServletOutputStream os = ac.getResponse().getOutputStream();
+                final ServletOutputStream os = ac.getResponse().getOutputStream();
                 os.println(msg.getSubject());
-                os.flush();
-                ac.getResponse().flushBuffer();
+                ac.complete();
             } catch (IOException ex) {
+                Logger.getLogger(NewMessageNotifierLongPolling.class.getName()).log(Level.SEVERE, null, ex);
+            } finally {
                 peers.remove(ac);
             }
         }
@@ -79,14 +80,8 @@ public class NewMessageNotifierComet extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
         response.flushBuffer();
 
-        ServletOutputStream os = response.getOutputStream();
-        // for IE - if no response is recieved IE will close down the connection.
-        os.println("<!-- Comet Response -->");
-        os.flush();
-        response.flushBuffer();
-
-        final AsyncContext ac = request.startAsync();
-        ac.setTimeout(600 * 1000);
+        final AsyncContext ac = request.startAsync(request, response);
+        ac.setTimeout(35 * 1000);
         ac.addListener(new AsyncListener() {
             @Override
             public void onComplete(AsyncEvent event) throws IOException {

@@ -27,16 +27,26 @@ public class Message implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    private Integer id;
+
     private String subject;
 
-    private String msg;
+    private String content;
 
     public Message() {
     }
 
-    public Message(String subject, String msg) {
+    public Message(String subject, String content) {
         this.subject = subject;
-        this.msg = msg;
+        this.content = content;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getSubject() {
@@ -47,11 +57,11 @@ public class Message implements Serializable {
         this.subject = subject;
     }
 
-    public String getMsg() {
-        return msg;
+    public String getContent() {
+        return content;
     }
 
-    public void setMsg(String msg) {
-        this.msg = msg;
+    public void setContent(String content) {
+        this.content = content;
     }
 }

@@ -20,7 +20,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-import javax.annotation.PostConstruct;
 import javax.ejb.Singleton;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
@@ -39,14 +38,9 @@ public class MessageBoundary {
     @Inject
     private Event<Message> newMsgEvent;
 
-    @PostConstruct
-    public void postConstruct() {
-        this.addMessage(new Message("First Msg", "Content of first msg."));
-        this.addMessage(new Message("Second Msg", "Content of second msg."));
-    }
-
     public void addMessage(final Message msg) {
-        messageStore.put(nextId.getAndIncrement(), msg);
+        msg.setId(nextId.getAndIncrement());
+        messageStore.put(msg.getId(), msg);
         newMsgEvent.fire(msg);
     }
 
@@ -58,8 +52,12 @@ public class MessageBoundary {
         return messageStore.values();
     }
 
-    public Message getNewMessages() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void changeMessage(final Message msg) {
+        messageStore.put(msg.getId(), msg);
+    }
+
+    public void removeMessage(final Integer id) {
+        messageStore.remove(id);
     }
 
 }

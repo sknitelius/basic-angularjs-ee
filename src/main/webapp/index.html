@@ -17,38 +17,56 @@
 <html ng-app="messageApp">
     <head>
         <meta charset="utf-8">
-        <title ng-bind-template="{{world}}"></title>
-        <link rel="stylesheet" href="css/app.css">
+        <title>angularJS-JEE6-Sample</title>
         <script src="js/libs/angular.js/angular.js"></script>
-        <script src="js/controllers.js"></script>
+        <script src="js/libs/angular.js/angular-resource.js"></script>
         <script src="js/libs/jquery/jquery.js"></script>
+        <script src="js/app.js"></script>
+        <link rel="stylesheet" href="css/bootstrap.css" />
     </head>
-    <body ng-controller="MessageController">
+    <body ng-controller="messageController">
         <div>
-            <span id="msgNotification"></span>
+            <span id="msgNotification">Message: {{newMsg}}</span>
         </div>
-        <div id="msgInputArea">
-            <p>Hello {{world}}!</p>
-            <label>Subject:</label> <input ng-model="subject" />
-            <label>Message:</label> <input ng-model="message" />
-            <button>Submit</button>
+        <div id="msgInputArea" class="form-inline">
+            <label class="control-label">Subject:</label> <input ng-model="message.subject" class="form-control"/>
+            <label class="control-label">Message:</label> <input ng-model="message.content" class="form-control"/>
+            <button ng-click="newMessage()" class="btn btn-default">Submit</button>
         </div>
         <div id="msgOutputArea">
-            
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Subject</th>
+                        <th>Content</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tr ng-repeat="msg in messages">
+                    <td>{{msg.id}}</td>
+                    <td><input ng-model="msg.subject" class="form-control"/></td>
+                    <td><input ng-model="msg.content" class="form-control"/></td>
+                    <td>
+                        <button ng-click="updateMessage(msg)" class="btn btn-warning">update</button>
+                        <button ng-click="deleteMessage(msg.id)" class="btn btn-danger">delete</button>
+                    </td>
+                </tr>
+            </table>
         </div>
-        <script>
+        <!--script>
                     function getRootURI() {
-                        return "http://"+(document.location.hostname === "" ? "localhost" : document.location.hostname) + ":" +
+                        return "http://" + (document.location.hostname === "" ? "localhost" : document.location.hostname) + ":" +
                                 (document.location.port === "" ? "8080" : document.location.port);
                     };
-                    
+
                     (function poll() {
-                        $.ajax({url: getRootURI() + "/basic-angularJS-EE/newmsg", success: function(data) {
+                        $.ajax({url: getRootURI() + "/basic-angularhs-ee/newmsg", success: function(data) {
                                 var newMsg = $("msgNotification");
                                 newMsg.empty();
                                 newMsg.append("<p>" + data + "</p>");
                             }, dataType: "plain/text", complete: poll, timeout: 30000});
                     })();
-        </script>
+        </script -->
     </body>
 </html>
