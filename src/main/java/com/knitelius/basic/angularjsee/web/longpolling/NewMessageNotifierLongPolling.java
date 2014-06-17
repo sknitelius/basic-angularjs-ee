@@ -55,11 +55,9 @@ public class NewMessageNotifierLongPolling extends HttpServlet {
             try {
                 final ServletOutputStream os = ac.getResponse().getOutputStream();
                 os.println(msg.getSubject());
-                ac.complete();
+                ac.getResponse().flushBuffer();
             } catch (IOException ex) {
                 Logger.getLogger(NewMessageNotifierLongPolling.class.getName()).log(Level.SEVERE, null, ex);
-            } finally {
-                peers.remove(ac);
             }
         }
     }
@@ -74,7 +72,7 @@ public class NewMessageNotifierLongPolling extends HttpServlet {
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.setContentType(MediaType.TEXT_PLAIN);
+        response.setContentType(MediaType.TEXT_HTML);
         response.setStatus(202);
         response.setHeader("Pragma", "no-cache");
         response.setCharacterEncoding("UTF-8");
@@ -104,5 +102,4 @@ public class NewMessageNotifierLongPolling extends HttpServlet {
         });
         peers.add(ac);
     }
-
 }

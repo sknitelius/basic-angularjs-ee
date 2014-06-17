@@ -38,10 +38,11 @@ public class MessageBoundary {
     @Inject
     private Event<Message> newMsgEvent;
 
-    public void addMessage(final Message msg) {
+    public Message addMessage(final Message msg) {
         msg.setId(nextId.getAndIncrement());
         messageStore.put(msg.getId(), msg);
         newMsgEvent.fire(msg);
+        return msg;
     }
 
     public Message getMessageById(final Integer id) {

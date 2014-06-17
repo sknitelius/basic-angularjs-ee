@@ -49,13 +49,13 @@ messageApp.controller('messageController', function($scope, createMessageService
 })(); 
 
     $scope.newMessage = function() {
-        createMessageService.create($scope.message);
-        $scope.messages = messagesService.query();
+        var newEntry = createMessageService.create($scope.message);
+        $scope.messages[$scope.messages.length] = newEntry;
     };
     
-    $scope.deleteMessage = function(msgId) {
-        messageService.delete({id: msgId});
-        $scope.messages = messagesService.query();
+    $scope.deleteMessage = function(msg) {
+        messageService.delete({id: msg.id});
+        $scope.messages.splice($.inArray(msg, $scope.messages),1);
     };
 
     $scope.updateMessage = function(message) {

@@ -48,8 +48,9 @@ public class MessageFacadeRest {
 
     @POST
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public void addMessage(final Message message) {
-        messageBoundary.addMessage(message);
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Message addMessage(final Message message) {
+        return messageBoundary.addMessage(message);
     }
 
     @PUT
