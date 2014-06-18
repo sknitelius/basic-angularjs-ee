@@ -15,10 +15,24 @@
  */
 var messageApp = angular.module('messageApp', ['ngResource']);
 
+messageApp.run(function(newMessagePoller) {});
+
 messageApp.factory('messagesService', function($resource) {
     return $resource('/basic-angularjs-ee/resources/message/all', {}, {
         query: {method: 'GET', isArray: true}
     });
+});
+
+messageApp.factory('newMessagePoller', function($http, $timeout) {
+    var data = {response: {}};
+    var poller = function() {
+        $http.get('/basic-angularjs-ee/newmsg').then(function(r) {
+            data.response = r.data;
+            $timeout(poller, 1);
+        });
+    };
+    poller();
+    return {data: data};
 });
 
 messageApp.factory('createMessageService', function($resource) {
@@ -35,27 +49,18 @@ messageApp.factory('messageService', function($resource) {
     });
 });
 
-messageApp.controller('messageController', function($scope, createMessageService, messagesService, messageService) {
+messageApp.controller('messageCtrl', function($scope, newMessagePoller, createMessageService, messagesService, messageService) {
     $scope.messages = messagesService.query();
-
-    (function poll() {
-    $.ajax({
-        url: "http://localhost:8080/basic-angularjs-ee/newmsg",
-        success: function(data) {
-            $scope.newMsg = data;
-        },
-        dataType: "text", complete: poll, timeout: 30000
-    });
-})(); 
+    $scope.newMsg = newMessagePoller.data;
 
     $scope.newMessage = function() {
         var newEntry = createMessageService.create($scope.message);
-        $scope.messages[$scope.messages.length] = newEntry;
+        $scope.messages.push(newEntry);
     };
-    
+
     $scope.deleteMessage = function(msg) {
         messageService.delete({id: msg.id});
-        $scope.messages.splice($.inArray(msg, $scope.messages),1);
+        $scope.messages.splice($.inArray(msg, $scope.messages), 1);
     };
 
     $scope.updateMessage = function(message) {

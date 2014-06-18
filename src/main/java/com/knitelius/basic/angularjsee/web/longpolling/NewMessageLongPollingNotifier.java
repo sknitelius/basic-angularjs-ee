@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Stephan Knitelius.
+ * Copyright 2014 Stephan Knitelius <stephan@knitelius.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,31 +19,21 @@ import com.knitelius.basic.angularjsee.model.Message;
 import java.io.IOException;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import javax.ejb.Singleton;
 import javax.enterprise.event.Observes;
 import javax.servlet.AsyncContext;
 import javax.servlet.AsyncEvent;
 import javax.servlet.AsyncListener;
-import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.MediaType;
 
 /**
- * Long Polling allows the Server to push notifications to the connected peers.
- * This is necesssary because WebSocket has only become available from JEE 7
- * onwards.
  *
  * @author Stephan Knitelius <stephan@knitelius.com>
  */
-@WebServlet(urlPatterns = {"/newmsg"}, asyncSupported = true)
-public class NewMessageNotifierLongPolling extends HttpServlet {
+@Singleton
+public class NewMessageLongPollingNotifier {
 
-    private static final Queue<AsyncContext> peers = new ConcurrentLinkedQueue();
+    private final Queue<AsyncContext> peers = new ConcurrentLinkedQueue();
 
     /**
      * Notifies the Clients that a new Message has been recieved.
@@ -55,31 +45,16 @@ public class NewMessageNotifierLongPolling extends HttpServlet {
             try {
                 final ServletOutputStream os = ac.getResponse().getOutputStream();
                 os.println(msg.getSubject());
-                ac.getResponse().flushBuffer();
+                ac.complete();
             } catch (IOException ex) {
-                Logger.getLogger(NewMessageNotifierLongPolling.class.getName()).log(Level.SEVERE, null, ex);
+                //connection was most likely closed by client, no further action required.
+            } finally {
+                peers.remove(ac);
             }
         }
     }
 
-    /**
-     * Register new long polling peers via get request.
-     *
-     * @param request
-     * @param response
-     * @throws javax.servlet.ServletException
-     * @throws java.io.IOException
-     */
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.setContentType(MediaType.TEXT_HTML);
-        response.setStatus(202);
-        response.setHeader("Pragma", "no-cache");
-        response.setCharacterEncoding("UTF-8");
-        response.flushBuffer();
-
-        final AsyncContext ac = request.startAsync(request, response);
-        ac.setTimeout(35 * 1000);
+    public void addAsyncContext(final AsyncContext ac) {
         ac.addListener(new AsyncListener() {
             @Override
             public void onComplete(AsyncEvent event) throws IOException {
@@ -102,4 +77,5 @@ public class NewMessageNotifierLongPolling extends HttpServlet {
         });
         peers.add(ac);
     }
+
 }
