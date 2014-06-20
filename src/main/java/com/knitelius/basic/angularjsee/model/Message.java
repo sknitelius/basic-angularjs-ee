@@ -16,9 +16,7 @@
 package com.knitelius.basic.angularjsee.model;
 
 import java.io.Serializable;
-import javax.json.Json;
 import javax.xml.bind.annotation.XmlRootElement;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  *
@@ -65,13 +63,5 @@ public class Message implements Serializable {
 
     public void setContent(String content) {
         this.content = content;
-    }
-
-    public String toJson() {
-        return Json.createObjectBuilder()
-                .add("id", id)
-                .add("subject", StringUtils.defaultString(subject))
-                .add("content", StringUtils.defaultString(content))
-                .build().toString();
     }
 }

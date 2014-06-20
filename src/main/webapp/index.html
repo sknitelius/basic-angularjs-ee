@@ -26,8 +26,8 @@
     </head>
     <body ng-controller="messageCtrl">
         <div>
-            <span id="msgNotification">Message: {{newMsg}}</span>
-            <span>Comp: {{comp}}</span>
+            <span id="msgNotification">MessageNotification: {{newMsg}}</span>
+            <span id="msgSubmitted">Message Submitted: {{comp}}</span>
         </div>
         <div id="msgInputArea" class="form-inline">
             <label>Subject:</label> <input ng-model="message.subject" class="form-control"/>
@@ -46,10 +46,9 @@
                 </thead>
                 <tr ng-repeat="msg in messages">
                     <td>{{msg.id}}</td>
-                    <td><input ng-model="msg.subject" class="form-control"/></td>
-                    <td><input ng-model="msg.content" class="form-control"/></td>
+                    <td><input ng-model="msg.subject" ng-change="updateMessage(msg)" class="form-control"/></td>
+                    <td><input ng-model="msg.content" ng-change="updateMessage(msg)" class="form-control"/></td>
                     <td>
-                        <button ng-click="updateMessage(msg)" class="btn btn-warning">update</button>
                         <button ng-click="deleteMessage(msg)" class="btn btn-danger">delete</button>
                     </td>
                 </tr>

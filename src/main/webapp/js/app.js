@@ -61,18 +61,18 @@ messageApp.controller('messageCtrl', function($scope, newMessagePoller, createMe
             },
             function(messageEvent) {
                 $scope.newMsg = messageEvent;
-                if (messageEvent.event === 'CREATE') {
-                    $scope.messages.push(messageEvent);
+                var msg = messageEvent.message;
+                if (messageEvent.eventType === 'CREATE') {
+                    $scope.messages.push(msg);
                 }
-                else if (messageEvent.event === 'DELETE') {
-                    $scope.messages.splice(findIndexForId(messageEvent.id, $scope.messages),1);
-                } else if (messageEvent.event === 'UPDATE') {
-                    var oldMsg = $.grep($scope.messages, function(msg, index) {
-                        return msg.id === messageEvent.id;
+                else if (messageEvent.eventType === 'DELETE') {
+                    $scope.messages.splice(findIndexOfElementById(msg.id, $scope.messages),1);
+                } else if (messageEvent.eventType === 'UPDATE') {
+                    var msgEntry = $.grep($scope.messages, function(compMsg, index) {
+                        return compMsg.id === msg.id;
                     })[0];
-                    oldMsg.subject = messageEvent.subject;
-                    oldMsg.content = messageEvent.content;
-//                    $scope.messages[$.inArray(newMsg.id, $scope.messages)] = newMsg;
+                    msgEntry.subject = msg.subject;
+                    msgEntry.content = msg.content;
                 }
             }
     );
@@ -91,7 +91,7 @@ messageApp.controller('messageCtrl', function($scope, newMessagePoller, createMe
         messageService.update(message);
     };
 
-    function findIndexForId(id, array) {
+    function findIndexOfElementById(id, array) {
         for (var i = 0; i < array.length; i++) {
             if (array[i]['id'] === id) {
                 return i;

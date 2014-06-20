@@ -16,13 +16,13 @@
 package com.knitelius.basic.angularjsee.events;
 
 import com.knitelius.basic.angularjsee.model.Message;
-import javax.json.Json;
-import org.apache.commons.lang3.StringUtils;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 /**
  *
  * @author Stephan Knitelius <stephan@knitelius.com>
  */
+@JsonSerialize
 public class MessageEvent {
 
     public enum EventType {
@@ -55,14 +55,5 @@ public class MessageEvent {
 
     public void setMessage(Message message) {
         this.message = message;
-    }
-
-    public String toJson() {
-        return Json.createObjectBuilder()
-                .add("id", message.getId())
-                .add("subject", StringUtils.defaultString(message.getSubject()))
-                .add("content", StringUtils.defaultString(message.getContent()))
-                .add("event", eventType.toString())
-                .build().toString();
     }
 }

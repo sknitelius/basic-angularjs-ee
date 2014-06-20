@@ -25,6 +25,7 @@ import javax.servlet.AsyncContext;
 import javax.servlet.AsyncEvent;
 import javax.servlet.AsyncListener;
 import javax.servlet.ServletOutputStream;
+import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  *
@@ -44,7 +45,7 @@ public class NewMessageLongPollingNotifier {
         for (final AsyncContext ac : peers) {
             try {
                 final ServletOutputStream os = ac.getResponse().getOutputStream();
-                os.println(msgEvent.toJson());
+                new ObjectMapper().writeValue(os, msgEvent);
                 ac.complete();
             } catch (IOException ex) {
                 //connection was most likely closed by client, no further action required.
