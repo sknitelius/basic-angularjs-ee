@@ -15,7 +15,8 @@
  */
 var messageApp = angular.module('messageApp', ['ngResource']);
 
-messageApp.run(function(newMessagePoller) {});
+messageApp.run(function(newMessagePoller) {
+});
 
 messageApp.factory('messagesService', function($resource) {
     return $resource('/basic-angularjs-ee/resources/message/all', {}, {
@@ -23,16 +24,17 @@ messageApp.factory('messagesService', function($resource) {
     });
 });
 
-messageApp.factory('newMessagePoller', function($http, $timeout) {
-    var data = {response: {}};
+messageApp.factory('newMessagePoller', function($http, $timeout, $q) {
+    var data = {data: ''};
     var poller = function() {
         $http.get('/basic-angularjs-ee/newmsg').then(function(r) {
-            data.response = r.data;
+            data.data = r.data;
             $timeout(poller, 1);
         });
     };
+
     poller();
-    return {data: data};
+    return data;
 });
 
 messageApp.factory('createMessageService', function($resource) {
@@ -51,20 +53,51 @@ messageApp.factory('messageService', function($resource) {
 
 messageApp.controller('messageCtrl', function($scope, newMessagePoller, createMessageService, messagesService, messageService) {
     $scope.messages = messagesService.query();
-    $scope.newMsg = newMessagePoller.data;
+    $scope.newMsg = '';
+
+    $scope.$watch(
+            function() {
+                return newMessagePoller.data;
+            },
+            function(messageEvent) {
+                $scope.newMsg = messageEvent;
+                if (messageEvent.event === 'CREATE') {
+                    $scope.messages.push(messageEvent);
+                }
+                else if (messageEvent.event === 'DELETE') {
+                    $scope.messages.splice(findIndexForId(messageEvent.id, $scope.messages),1);
+                } else if (messageEvent.event === 'UPDATE') {
+                    var oldMsg = $.grep($scope.messages, function(msg, index) {
+                        return msg.id === messageEvent.id;
+                    })[0];
+                    oldMsg.subject = messageEvent.subject;
+                    oldMsg.content = messageEvent.content;
+//                    $scope.messages[$.inArray(newMsg.id, $scope.messages)] = newMsg;
+                }
+            }
+    );
 
     $scope.newMessage = function() {
         var newEntry = createMessageService.create($scope.message);
-        $scope.messages.push(newEntry);
+        $scope.comp = newEntry;
     };
 
     $scope.deleteMessage = function(msg) {
         messageService.delete({id: msg.id});
-        $scope.messages.splice($.inArray(msg, $scope.messages), 1);
     };
 
     $scope.updateMessage = function(message) {
+        delete message['event'];
         messageService.update(message);
     };
+
+    function findIndexForId(id, array) {
+        for (var i = 0; i < array.length; i++) {
+            if (array[i]['id'] === id) {
+                return i;
+            }
+        }
+        return -1;
+    }
 });
 

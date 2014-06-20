@@ -15,6 +15,7 @@
  */
 package com.knitelius.basic.angularjsee.service;
 
+import com.knitelius.basic.angularjsee.events.MessageEvent;
 import com.knitelius.basic.angularjsee.model.Message;
 import java.util.Collection;
 import java.util.HashMap;
@@ -36,12 +37,12 @@ public class MessageBoundary {
     private final AtomicInteger nextId = new AtomicInteger();
 
     @Inject
-    private Event<Message> newMsgEvent;
+    private Event<MessageEvent> messageEvent;
 
     public Message addMessage(final Message msg) {
         msg.setId(nextId.getAndIncrement());
         messageStore.put(msg.getId(), msg);
-        newMsgEvent.fire(msg);
+        messageEvent.fire(new MessageEvent(MessageEvent.EventType.CREATE, msg));
         return msg;
     }
 
@@ -55,9 +56,11 @@ public class MessageBoundary {
 
     public void changeMessage(final Message msg) {
         messageStore.put(msg.getId(), msg);
+        messageEvent.fire(new MessageEvent(MessageEvent.EventType.UPDATE, msg));
     }
 
     public void removeMessage(final Integer id) {
+        messageEvent.fire(new MessageEvent(MessageEvent.EventType.DELETE, messageStore.get(id)));
         messageStore.remove(id);
     }
 

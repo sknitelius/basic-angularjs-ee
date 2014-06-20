@@ -15,7 +15,7 @@
  */
 package com.knitelius.basic.angularjsee.web.longpolling;
 
-import com.knitelius.basic.angularjsee.model.Message;
+import com.knitelius.basic.angularjsee.events.MessageEvent;
 import java.io.IOException;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -38,13 +38,13 @@ public class NewMessageLongPollingNotifier {
     /**
      * Notifies the Clients that a new Message has been recieved.
      *
-     * @param msg Message
+     * @param msgEvent
      */
-    public void notifyClientsAboutNewMessage(@Observes Message msg) {
+    public void notifyClientsAboutNewMessage(@Observes MessageEvent msgEvent) {
         for (final AsyncContext ac : peers) {
             try {
                 final ServletOutputStream os = ac.getResponse().getOutputStream();
-                os.println(msg.getSubject());
+                os.println(msgEvent.toJson());
                 ac.complete();
             } catch (IOException ex) {
                 //connection was most likely closed by client, no further action required.
