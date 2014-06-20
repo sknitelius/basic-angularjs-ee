@@ -19,6 +19,7 @@ import com.knitelius.basic.angularjsee.model.Message;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 /**
+ * Model used to notify the clients about changes to the Messages.
  *
  * @author Stephan Knitelius <stephan@knitelius.com>
  */

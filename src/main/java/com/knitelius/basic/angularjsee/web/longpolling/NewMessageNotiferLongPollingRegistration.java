@@ -26,17 +26,16 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.MediaType;
 
 /**
- * Long Polling allows the Server to push notifications to the connected peers.
- * This is necesssary because WebSocket has only become available from JEE 7
- * onwards.
+ * Long Polling registration, this HTTP Servlet allows the client to register
+ * its long polling request.
  *
  * @author Stephan Knitelius <stephan@knitelius.com>
  */
-@WebServlet(urlPatterns = {"/newmsg"}, asyncSupported = true, loadOnStartup = 1)
+@WebServlet(urlPatterns = {"/msgnotification"}, asyncSupported = true, loadOnStartup = 1)
 public class NewMessageNotiferLongPollingRegistration extends HttpServlet {
 
     @EJB
-    private NewMessageLongPollingNotifier notifier;
+    private MessageEventLongPollingNotifier notifier;
 
     /**
      * Register new long polling peers via get request.
@@ -56,6 +55,6 @@ public class NewMessageNotiferLongPollingRegistration extends HttpServlet {
 
         final AsyncContext ac = request.startAsync(request, response);
         ac.setTimeout(35 * 1000);
-        notifier.addAsyncContext(ac);
+        notifier.registerNewAsyncContext(ac);
     }
 }

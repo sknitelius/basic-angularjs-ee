@@ -30,6 +30,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 /**
+ * Message REST Facade, offers simple CRUD functionality.
  *
  * @author Stephan Knitelius <stephan@knitelius.com>
  */

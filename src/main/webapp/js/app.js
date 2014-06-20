@@ -27,7 +27,7 @@ messageApp.factory('messagesService', function($resource) {
 messageApp.factory('newMessagePoller', function($http, $timeout, $q) {
     var data = {data: ''};
     var poller = function() {
-        $http.get('/basic-angularjs-ee/newmsg').then(function(r) {
+        $http.get('/basic-angularjs-ee/msgnotification').then(function(r) {
             data.data = r.data;
             $timeout(poller, 1);
         });

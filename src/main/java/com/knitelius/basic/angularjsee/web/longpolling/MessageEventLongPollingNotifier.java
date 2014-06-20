@@ -28,11 +28,13 @@ import javax.servlet.ServletOutputStream;
 import org.codehaus.jackson.map.ObjectMapper;
 
 /**
+ * Notifies all registered long polling requests about the Observed
+ * MessageEvents.
  *
  * @author Stephan Knitelius <stephan@knitelius.com>
  */
 @Singleton
-public class NewMessageLongPollingNotifier {
+public class MessageEventLongPollingNotifier {
 
     private final Queue<AsyncContext> peers = new ConcurrentLinkedQueue();
 
@@ -55,7 +57,7 @@ public class NewMessageLongPollingNotifier {
         }
     }
 
-    public void addAsyncContext(final AsyncContext ac) {
+    public void registerNewAsyncContext(final AsyncContext ac) {
         ac.addListener(new AsyncListener() {
             @Override
             public void onComplete(AsyncEvent event) throws IOException {

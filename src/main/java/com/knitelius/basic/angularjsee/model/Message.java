@@ -19,6 +19,7 @@ import java.io.Serializable;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
+ * Message model.
  *
  * @author Stephan Knitelius <stephan@knitelius.com>
  */
