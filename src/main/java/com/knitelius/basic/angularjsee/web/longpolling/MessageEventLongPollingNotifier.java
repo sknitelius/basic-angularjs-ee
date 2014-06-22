@@ -15,7 +15,7 @@
  */
 package com.knitelius.basic.angularjsee.web.longpolling;
 
-import com.knitelius.basic.angularjsee.events.MessageEvent;
+import com.knitelius.basic.angularjsee.model.MessageEvent;
 import java.io.IOException;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;

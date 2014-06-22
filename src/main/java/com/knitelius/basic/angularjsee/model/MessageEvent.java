@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.knitelius.basic.angularjsee.events;
+package com.knitelius.basic.angularjsee.model;
 
 import com.knitelius.basic.angularjsee.model.Message;
 import org.codehaus.jackson.map.annotate.JsonSerialize;

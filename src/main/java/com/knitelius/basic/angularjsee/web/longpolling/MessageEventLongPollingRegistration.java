@@ -32,7 +32,7 @@ import javax.ws.rs.core.MediaType;
  * @author Stephan Knitelius <stephan@knitelius.com>
  */
 @WebServlet(urlPatterns = {"/msgnotification"}, asyncSupported = true, loadOnStartup = 1)
-public class NewMessageNotiferLongPollingRegistration extends HttpServlet {
+public class MessageEventLongPollingRegistration extends HttpServlet {
 
     @EJB
     private MessageEventLongPollingNotifier notifier;

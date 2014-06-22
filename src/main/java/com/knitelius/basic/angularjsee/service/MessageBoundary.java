@@ -15,11 +15,11 @@
  */
 package com.knitelius.basic.angularjsee.service;
 
-import com.knitelius.basic.angularjsee.events.MessageEvent;
+import com.knitelius.basic.angularjsee.model.MessageEvent;
 import com.knitelius.basic.angularjsee.model.Message;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.ejb.Singleton;
 import javax.enterprise.event.Event;
@@ -32,9 +32,9 @@ import javax.inject.Inject;
 @Singleton
 public class MessageBoundary {
 
-    private final Map<Integer, Message> messageStore = new HashMap<>();
+    private static final Map<Integer, Message> messageStore = new ConcurrentHashMap<>();
 
-    private final AtomicInteger nextId = new AtomicInteger();
+    private static final AtomicInteger nextId = new AtomicInteger();
 
     @Inject
     private Event<MessageEvent> messageEvent;

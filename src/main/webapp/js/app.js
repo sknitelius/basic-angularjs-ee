@@ -15,7 +15,7 @@
  */
 var messageApp = angular.module('messageApp', ['ngResource']);
 
-messageApp.run(function(newMessagePoller) {
+messageApp.run(function(messageEventPoller) {
 });
 
 messageApp.factory('messagesService', function($resource) {
@@ -24,7 +24,7 @@ messageApp.factory('messagesService', function($resource) {
     });
 });
 
-messageApp.factory('newMessagePoller', function($http, $timeout, $q) {
+messageApp.factory('messageEventPoller', function($http, $timeout, $q) {
     var data = {data: ''};
     var poller = function() {
         $http.get('/basic-angularjs-ee/msgnotification').then(function(r) {
@@ -51,13 +51,13 @@ messageApp.factory('messageService', function($resource) {
     });
 });
 
-messageApp.controller('messageCtrl', function($scope, newMessagePoller, createMessageService, messagesService, messageService) {
+messageApp.controller('messageCtrl', function($scope, messageEventPoller, createMessageService, messagesService, messageService) {
     $scope.messages = messagesService.query();
     $scope.newMsg = '';
 
     $scope.$watch(
             function() {
-                return newMessagePoller.data;
+                return messageEventPoller.data;
             },
             function(messageEvent) {
                 $scope.newMsg = messageEvent;
