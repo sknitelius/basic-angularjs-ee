@@ -9,4 +9,9 @@
             30
         </session-timeout>
     </session-config>
+    
+    <filter-mapping>
+      <filter-name>CDI Conversation Filter</filter-name>
+      <url-pattern>/resources/*</url-pattern>
+   </filter-mapping>
 </web-app>

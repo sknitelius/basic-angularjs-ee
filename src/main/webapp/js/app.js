@@ -15,8 +15,14 @@
  */
 var messageApp = angular.module('messageApp', ['ngResource']);
 
-messageApp.run(function(messageEventPoller) {
-});
+
+//Conversation ID
+var cid = '';
+
+$.getJSON("http://localhost:8080/basic-angularjs-ee/resources/conversationwizard",
+        function(data) {
+            cid = data;
+        });
 
 messageApp.factory('messagesService', function($resource) {
     return $resource('/basic-angularjs-ee/resources/message/all', {}, {
@@ -24,10 +30,10 @@ messageApp.factory('messagesService', function($resource) {
     });
 });
 
-messageApp.factory('messageEventPoller', function($http, $timeout, $q) {
+messageApp.factory('messageEventPoller', function($http, $timeout) {
     var data = {data: ''};
     var poller = function() {
-        $http.get('/basic-angularjs-ee/msgnotification').then(function(r) {
+        $http.get('/basic-angularjs-ee/msgnotification?cid=' + cid).then(function(r) {
             data.data = r.data;
             $timeout(poller, 1);
         });
@@ -38,13 +44,13 @@ messageApp.factory('messageEventPoller', function($http, $timeout, $q) {
 });
 
 messageApp.factory('createMessageService', function($resource) {
-    return $resource('/basic-angularjs-ee/resources/message', {}, {
+    return $resource('/basic-angularjs-ee/resources/message?cid=' + cid, {}, {
         create: {method: 'POST'}
     });
 });
 
 messageApp.factory('messageService', function($resource) {
-    return $resource('/basic-angularjs-ee/resources/message/:id', {}, {
+    return $resource('/basic-angularjs-ee/resources/message/:id?cid=' + cid, {}, {
         show: {method: 'GET'},
         update: {method: 'PUT', params: {id: '@id'}},
         delete: {method: 'DELETE', params: {id: '@id'}}
@@ -66,7 +72,7 @@ messageApp.controller('messageCtrl', function($scope, messageEventPoller, create
                     $scope.messages.push(msg);
                 }
                 else if (messageEvent.eventType === 'DELETE') {
-                    $scope.messages.splice(findIndexOfElementById(msg.id, $scope.messages),1);
+                    $scope.messages.splice(findIndexOfElementById(msg.id, $scope.messages), 1);
                 } else if (messageEvent.eventType === 'UPDATE') {
                     var msgEntry = $.grep($scope.messages, function(compMsg, index) {
                         return compMsg.id === msg.id;

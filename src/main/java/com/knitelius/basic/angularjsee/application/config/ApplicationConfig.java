@@ -38,6 +38,7 @@ public class ApplicationConfig extends Application {
      * out calling this method in getClasses().
      */
     private void addRestResourceClasses(Set<Class<?>> resources) {
+        resources.add(com.knitelius.basic.angularjsee.web.rest.ConversationWizard.class);
         resources.add(com.knitelius.basic.angularjsee.web.rest.MessageFacadeRest.class);
     }
 
