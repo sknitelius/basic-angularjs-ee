@@ -16,15 +16,23 @@
     
     <dependencies>
         <dependency>
+            <groupId>javax</groupId>
+            <artifactId>javaee-web-api</artifactId>
+            <version>6.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- Jackson required for JSON parsing in the Long Polling servlet. -->
+        <dependency>
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-mapper-asl</artifactId>
             <version>1.8.5</version>
             <type>jar</type>
         </dependency>
+        <!-- weld-core required for RESTFull ConversationScope mapping. -->
         <dependency>
-            <groupId>javax</groupId>
-            <artifactId>javaee-web-api</artifactId>
-            <version>6.0</version>
+            <groupId>org.jboss.weld</groupId>
+            <artifactId>weld-core</artifactId>
+            <version>1.1.19.Final</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

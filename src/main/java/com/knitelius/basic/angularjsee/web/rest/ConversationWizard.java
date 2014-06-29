@@ -22,6 +22,8 @@ import javax.inject.Inject;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 
 /**
  * Allows the management of CDI Conversations via HTTP GET and DELETE.
@@ -36,6 +38,7 @@ public class ConversationWizard implements Serializable {
     private Conversation conversation;
 
     @GET
+    @Produces(MediaType.TEXT_PLAIN)
     public String startConversation() {
         if (conversation.isTransient()) {
             conversation.begin();

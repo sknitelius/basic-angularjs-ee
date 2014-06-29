@@ -13,16 +13,43 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-var messageApp = angular.module('messageApp', ['ngResource']);
 
-
-//Conversation ID
 var cid = '';
 
-$.getJSON("http://localhost:8080/basic-angularjs-ee/resources/conversationwizard",
-        function(data) {
-            cid = data;
+$.ajax({
+    url: "http://localhost:8080/basic-angularjs-ee/resources/conversationwizard"
+}).then(function(data) {
+    console.log('cid: ' + data);
+    cid = data;
+});
+
+var messageApp = angular.module('messageApp', ['ngResource']);
+
+messageApp.factory('conversationService', function() {
+//    var data = {cid: ''};
+//    $http({method: "GET", url: '/basic-angularjs-ee/resources/conversationwizard'}, {cache: true})
+//            .success(function(d) {
+//                data.cid = d;
+//            })
+//            .error(function(data) {
+//                alert("Could not initiate conversation" + data);
+//            });
+//    return data;
+    var data = {cid: ''};
+//    data.cid = cid.data;
+
+    $.ajax({
+        url: '/basic-angularjs-ee/resources/conversationwizard',
+        async : false 
+       })
+       .done(function(d) {
+            data.cid = d;
+        })
+       .fail(function(){
+            alert("Could not initiate conversation" + data);  
         });
+    return data;
+});
 
 messageApp.factory('messagesService', function($resource) {
     return $resource('/basic-angularjs-ee/resources/message/all', {}, {
@@ -30,43 +57,42 @@ messageApp.factory('messagesService', function($resource) {
     });
 });
 
-messageApp.factory('messageEventPoller', function($http, $timeout) {
+messageApp.factory('messageEventPoller', function($http, $timeout, conversationService) {
     var data = {data: ''};
     var poller = function() {
-        $http.get('/basic-angularjs-ee/msgnotification?cid=' + cid).then(function(r) {
+        $http.get('/basic-angularjs-ee/msgnotification?cid=' + conversationService.cid).then(function(r) {
             data.data = r.data;
             $timeout(poller, 1);
         });
     };
-
     poller();
     return data;
 });
 
-messageApp.factory('createMessageService', function($resource) {
-    return $resource('/basic-angularjs-ee/resources/message?cid=' + cid, {}, {
-        create: {method: 'POST'}
+messageApp.factory('createMessageService', function($resource, conversationService) {
+    return $resource('/basic-angularjs-ee/resources/message?cid=:cid', {}, {
+        create: {method: 'POST', params: {cid: conversationService.cid}}
     });
 });
 
-messageApp.factory('messageService', function($resource) {
-    return $resource('/basic-angularjs-ee/resources/message/:id?cid=' + cid, {}, {
+messageApp.factory('messageService', function($resource, conversationService) {
+    return $resource('/basic-angularjs-ee/resources/message/:id?cid=:cid', {}, {
         show: {method: 'GET'},
-        update: {method: 'PUT', params: {id: '@id'}},
-        delete: {method: 'DELETE', params: {id: '@id'}}
+        update: {method: 'PUT', params: {id: '@id', cid: conversationService.cid}},
+        delete: {method: 'DELETE', params: {id: '@id', cid: conversationService.cid}}
     });
 });
 
-messageApp.controller('messageCtrl', function($scope, messageEventPoller, createMessageService, messagesService, messageService) {
+messageApp.controller('messageCtrl', function($scope, messageEventPoller, createMessageService, messagesService, messageService, conversationService) {
     $scope.messages = messagesService.query();
-    $scope.newMsg = '';
-
+    $scope.message = {id: '', subject: '', content: ''};
+    $scope.cid = conversationService.cid;
     $scope.$watch(
             function() {
                 return messageEventPoller.data;
             },
             function(messageEvent) {
-                $scope.newMsg = messageEvent;
+                $scope.messageEvent = messageEvent;
                 var msg = messageEvent.message;
                 if (messageEvent.eventType === 'CREATE') {
                     $scope.messages.push(msg);
@@ -82,21 +108,17 @@ messageApp.controller('messageCtrl', function($scope, messageEventPoller, create
                 }
             }
     );
-
     $scope.newMessage = function() {
         var newEntry = createMessageService.create($scope.message);
         $scope.comp = newEntry;
     };
-
     $scope.deleteMessage = function(msg) {
         messageService.delete({id: msg.id});
     };
-
     $scope.updateMessage = function(message) {
         delete message['event'];
         messageService.update(message);
     };
-
     function findIndexOfElementById(id, array) {
         for (var i = 0; i < array.length; i++) {
             if (array[i]['id'] === id) {
