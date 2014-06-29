@@ -13,31 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-var cid = '';
-
-$.ajax({
-    url: "http://localhost:8080/basic-angularjs-ee/resources/conversationwizard"
-}).then(function(data) {
-    console.log('cid: ' + data);
-    cid = data;
-});
-
 var messageApp = angular.module('messageApp', ['ngResource']);
 
 messageApp.factory('conversationService', function() {
-//    var data = {cid: ''};
-//    $http({method: "GET", url: '/basic-angularjs-ee/resources/conversationwizard'}, {cache: true})
-//            .success(function(d) {
-//                data.cid = d;
-//            })
-//            .error(function(data) {
-//                alert("Could not initiate conversation" + data);
-//            });
-//    return data;
     var data = {cid: ''};
-//    data.cid = cid.data;
-
     $.ajax({
         url: '/basic-angularjs-ee/resources/conversationwizard',
         async : false 
